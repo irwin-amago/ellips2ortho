@@ -2,7 +2,8 @@ import pandas as pd
 import requests
 import streamlit as st
 
-st.title('Convert Ellipsoidal to Orthometric Heights')
+st.title('Ellipsoidal to Orthometric Heights')
+st.text('The script uses the NGS Geoid API to look up the geoid height at a particular location and uses this value to then compute the orthometric height based on the desired units of the user.')
 
 uploaded_csv = st.file_uploader('Please Select Geotags CSV.')
 
