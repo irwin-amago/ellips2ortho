@@ -5,5 +5,5 @@ channels:
 dependencies:
   - pip
   - pip:
-    - rasterio==1.2.10
-prefix: C:\Users\irwin\.conda\envs\streamlit
+    - http://www.lfd.uci.edu/~gohlke/pythonlibs/bofhrmxk/GDAL‑3.4.1‑cp38‑cp38‑win_amd64.whl
+    - http://www.lfd.uci.edu/~gohlke/pythonlibs/bofhrmxk/rasterio‑1.2.10‑cp38‑cp38‑win_amd64.whl
