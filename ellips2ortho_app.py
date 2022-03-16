@@ -58,7 +58,7 @@ if uploaded_csv is not None:
                   'GEOID18': 14}
     units_dict ={'Meters': 1, 'US Feet': 2}
     
-    geoid_select = st.selectbox('Please Choose Desired Geoid', ('<select>',
+    geoid_select = st.selectbox('Please Select Desired Geoid', ('<select>',
                                                                 'GEOID99',
                                                                 'G99SSS',
                                                                 'GEOID03',
