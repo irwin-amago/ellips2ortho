@@ -47,7 +47,7 @@ if not geoid_select=='<select>':
     st.write('You selected:', geoid_select)
     geoid = geoid_dict[geoid_select]
 
-units_select = st.selectbox('Please Select Desired Units', ('<select>', 'Meters','Feet'))
+units_select = st.selectbox('Please Select Desired Units', ('<select>', 'Meters','US Feet'))
 
 if not units_select=='<select>':
     st.write('You selected:', units_select)
