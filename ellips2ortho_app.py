@@ -54,7 +54,7 @@ if not units_select=='<select>':
     units = units_dict[units_select]
 
 if uploaded_csv is not None and not geoid_select=='<select>' and not units_select=='<select>':
-    col1, col2, col3 = st.beta_columns(3)
+    col1, col2, col3 = st.columns(3)
     with col1:
         pass
     with col3:
