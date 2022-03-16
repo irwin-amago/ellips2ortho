@@ -62,8 +62,7 @@ if uploaded_csv is not None and not geoid_select=='<select>' and not units_selec
         pass
     with col5:
         pass
-    with col3 :
-    center_button = st.button('Button')
+    with col3:
         if st.button('CONVERT HEIGHTS'):
             my_bar = st.progress(0)
             cmd = 'https://geodesy.noaa.gov/api/geoid/ght?'
