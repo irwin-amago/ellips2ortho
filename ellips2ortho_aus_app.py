@@ -4,8 +4,8 @@ import numpy
 import rasterio.sample
 import streamlit as st
 
-geoid09_file = r"C:\Users\irwin\OneDrive\Desktop\Ellips2Ortho\au_ga_AUSGeoid09_V1.01.tif"
-geoid20_file = r"C:\Users\irwin\OneDrive\Desktop\Ellips2Ortho\au_ga_AUSGeoid2020_20170908.tif"
+geoid09_file = './au_ga_AUSGeoid09_V1.01.tif'
+geoid20_file = './au_ga_AUSGeoid2020_20170908.tif'
 
 def geo_to_cart(lat, lon, h):
     lat_rad = (lat/180)*math.pi
