@@ -13,8 +13,6 @@ lat = 'latitude [decimal degrees]'
 lon = 'longitude [decimal degrees]'
 height = 'altitude [meter]'
 
-# Select Geoid Model
-
 geoid_dict = {'GEOID99': 1,
               'G99SSS': 2,
               'GEOID03': 3,
@@ -28,6 +26,8 @@ geoid_dict = {'GEOID99': 1,
               'GEOID12B': 13,
               'GEOID18': 14}
 units_dict ={'Meters': 1, 'US Feet': 2}
+
+# Select Geoid Model
 
 geoid_select = st.selectbox('Please Select Desired Geoid', ('<select>',
                                                             'GEOID99',
@@ -47,11 +47,15 @@ if not geoid_select=='<select>':
     st.write('You selected:', geoid_select)
     geoid = geoid_dict[geoid_select]
 
+# Select Units    
+
 units_select = st.selectbox('Please Select Desired Units', ('<select>', 'Meters','US Feet'))
 
 if not units_select=='<select>':
     st.write('You selected:', units_select)
     units = units_dict[units_select]
+
+# Height Conversion    
 
 if uploaded_csv is not None and not geoid_select=='<select>' and not units_select=='<select>':
     if st.button('CONVERT HEIGHTS'):
@@ -64,7 +68,9 @@ if uploaded_csv is not None and not geoid_select=='<select>' and not units_selec
             lon_req = str(df[lon][x])
             ellip = df[height][x]
             req = cmd + 'lat=' + lat_req + '&lon=' + lon_req + '&model=' + str(geoid)
-                
+            
+            # API Error Handling
+            
             try:
                 responseGeoid = requests.get(req)
                 responseGeoid.raise_for_status()
@@ -93,6 +99,8 @@ if uploaded_csv is not None and not geoid_select=='<select>' and not units_selec
             else:
                 ortho.append(ortho_height*3.2808399)
 
+        # Building converted dataframe
+        
         df[height] = ortho
         if units==1:
             df.rename(columns={height: 'orthometric height [meter]'}, inplace=True)
