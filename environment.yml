@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  -pip
+  - pip
   - pip:
     - rasterio==1.2.10
 prefix: C:\Users\irwin\.conda\envs\streamlit
