@@ -2,6 +2,8 @@ import pandas as pd
 import requests
 import streamlit as st
 
+st.title('Web Tool for Ellipsoidal to Orthometric Conversion')
+
 uploaded_csv = st.file_uploader('Please Select Geotags CSV.')
 
 if uploaded_csv is not None:
