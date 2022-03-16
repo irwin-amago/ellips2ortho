@@ -54,69 +54,78 @@ if not units_select=='<select>':
     units = units_dict[units_select]
 
 if uploaded_csv is not None and not geoid_select=='<select>' and not units_select=='<select>':
-    if st.button('CONVERT HEIGHTS'):
-        my_bar = st.progress(0)
-        cmd = 'https://geodesy.noaa.gov/api/geoid/ght?'
-        
-        ortho = []
-        for x in range(len(df[lat])):
-            lat_req = str(df[lat][x])
-            lon_req = str(df[lon][x])
-            ellip = df[height][x]
-            req = cmd + 'lat=' + lat_req + '&lon=' + lon_req + '&model=' + str(geoid)
-                
-            try:
-                responseGeoid = requests.get(req)
-                responseGeoid.raise_for_status()
-            except requests.HTTPError  as errh:
-                msg = "Error Connecting: " + str(errh)
-                st.error(msg)
-                st.stop()
-            except requests.ConnectionError as errc:
-                msg = "Error Connecting: " + str(errc)
-                st.error(msg)
-                st.stop()
-            except requests.Timeout as errt:
-                msg = "Error Connecting: " + str(errt)
-                st.error(msg)
-                st.stop()
-            except requests.RequestException as err:
-                msg = "Error Connecting: " + str(err)
-                st.error(msg)
-                st.stop()
-        
-            my_bar.progress((x+1)/len(df[lat]))     
-            ortho_height = ellip - responseGeoid.json()['geoidHeight']
-                
+    with col1:
+        pass
+    with col2:
+        pass
+    with col4:
+        pass
+    with col5:
+        pass
+    with col3 :
+    center_button = st.button('Button')
+        if st.button('CONVERT HEIGHTS'):
+            my_bar = st.progress(0)
+            cmd = 'https://geodesy.noaa.gov/api/geoid/ght?'
+
+            ortho = []
+            for x in range(len(df[lat])):
+                lat_req = str(df[lat][x])
+                lon_req = str(df[lon][x])
+                ellip = df[height][x]
+                req = cmd + 'lat=' + lat_req + '&lon=' + lon_req + '&model=' + str(geoid)
+
+                try:
+                    responseGeoid = requests.get(req)
+                    responseGeoid.raise_for_status()
+                except requests.HTTPError  as errh:
+                    msg = "Error Connecting: " + str(errh)
+                    st.error(msg)
+                    st.stop()
+                except requests.ConnectionError as errc:
+                    msg = "Error Connecting: " + str(errc)
+                    st.error(msg)
+                    st.stop()
+                except requests.Timeout as errt:
+                    msg = "Error Connecting: " + str(errt)
+                    st.error(msg)
+                    st.stop()
+                except requests.RequestException as err:
+                    msg = "Error Connecting: " + str(err)
+                    st.error(msg)
+                    st.stop()
+
+                my_bar.progress((x+1)/len(df[lat]))     
+                ortho_height = ellip - responseGeoid.json()['geoidHeight']
+
+                if units==1:
+                    ortho.append(ortho_height)
+                else:
+                    ortho.append(ortho_height*3.2808399)
+
+            df[height] = ortho
             if units==1:
-                ortho.append(ortho_height)
+                df.rename(columns={height: 'orthometric height [meter]'}, inplace=True)
             else:
-                ortho.append(ortho_height*3.2808399)
+                df['accuracy horizontal [meter]'] = df['accuracy horizontal [meter]'].apply(lambda x: x*3.2808399)
+                df['accuracy vertical [meter]'] = df['accuracy vertical [meter]'].apply(lambda x: x*3.2808399)
+                df.rename(columns={height: 'orthometric height [feet]',
+                                   'accuracy horizontal [meter]': 'accuracy horizontal [feet]', 
+                                   'accuracy vertical [meter]': 'accuracy vertical [feet]'}, inplace=True)
 
-        df[height] = ortho
-        if units==1:
-            df.rename(columns={height: 'orthometric height [meter]'}, inplace=True)
-        else:
-            df['accuracy horizontal [meter]'] = df['accuracy horizontal [meter]'].apply(lambda x: x*3.2808399)
-            df['accuracy vertical [meter]'] = df['accuracy vertical [meter]'].apply(lambda x: x*3.2808399)
-            df.rename(columns={height: 'orthometric height [feet]',
-                               'accuracy horizontal [meter]': 'accuracy horizontal [feet]', 
-                               'accuracy vertical [meter]': 'accuracy vertical [feet]'}, inplace=True)
-        
-        st.success('Height conversion finished. Click button below to download new CSV.')
-        
-        def convert_df(df):
-             return df.to_csv(index=False).encode('utf-8')
-        
-        csv = convert_df(df)
-        filename = uploaded_csv.name.split('.')[0] + '_orthometric.csv'
-        
-        st.download_button(
-             label="Download Converted Geotags CSV",
-             data=csv,
-             file_name=filename,
-             mime='text/csv',
-         )
+            st.success('Height conversion finished. Click button below to download new CSV.')
 
+            def convert_df(df):
+                 return df.to_csv(index=False).encode('utf-8')
+
+            csv = convert_df(df)
+            filename = uploaded_csv.name.split('.')[0] + '_orthometric.csv'
+
+            st.download_button(
+                 label="Download Converted Geotags CSV",
+                 data=csv,
+                 file_name=filename,
+                 mime='text/csv',
+             )
 st.stop()
 
