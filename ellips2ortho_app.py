@@ -2,7 +2,7 @@ import pandas as pd
 import requests
 import streamlit as st
 
-st.title('Web Tool for Ellipsoidal to Orthometric Conversion')
+st.title('Convert Ellipsoidal to Orthometric Heights')
 
 uploaded_csv = st.file_uploader('Please Select Geotags CSV.')
 
