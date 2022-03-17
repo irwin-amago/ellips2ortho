@@ -35,8 +35,8 @@ if uploaded_csv is not None:
              'ScatterplotLayer',
              data=points_df,
              get_position='[lon, lat]',
-             get_color='[70, 130, 180, 250]',
-             get_radius=18,
+             get_color='[70, 130, 180, 200]',
+             get_radius=15,
          ),
          ],
      ))
