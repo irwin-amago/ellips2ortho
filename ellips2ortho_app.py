@@ -67,7 +67,7 @@ if uploaded:
         # Check if CSV is in the correct format
         
         format_check = True
-        for column in expected_columns:
+        for column in required_columns:
             if column not in list(df.columns):
                 st.text(column + ' is not in ' + uploaded_csv.name + '.')
                 format_check = False
