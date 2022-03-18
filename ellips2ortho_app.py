@@ -1,15 +1,15 @@
 import pandas as pd
+import pydeck as pdk
 import requests
 import streamlit as st
-import pydeck as pdk
 import zipfile
-
 
 st.title('Ellipsoidal to Orthometric Heights')
 st.caption('The application uses the NGS Geoid API to look up the geoid height at a particular location and uses this value to then compute the orthometric height based on the desired units of the user.')
 
-uploaded_csvs = st.file_uploader('Please Select Geotags CSV.', accept_multiple_files=True)
+# Upload button for CSVs
 
+uploaded_csvs = st.file_uploader('Please Select Geotags CSV.', accept_multiple_files=True)
 uploaded = False
 
 for uploaded_csv in uploaded_csvs: 
@@ -17,6 +17,8 @@ for uploaded_csv in uploaded_csvs:
         uploaded = True
     else:
         uplaoded = False
+
+# Checking if upload of all CSVs is successful
 
 if uploaded:
     dfs = []
@@ -31,13 +33,15 @@ if uploaded:
         ctr += 1
     st.success('All CSCvs uploaded successfully.')
     
-    options = filenames.copy()
-    options.insert(0, '<select>')
-    option = st.selectbox('Select geotags CSV to visualize', options)
+    map_options = filenames.copy()
+    map_options.insert(0, '<select>')
+    option = st.selectbox('Select geotags CSV to visualize', map_options)
     
     lat = 'latitude [decimal degrees]'
     lon = 'longitude [decimal degrees]'
     height = 'altitude [meter]'
+    
+    # Option to visualize any of the CSVs
     
     if option != '<select>':
         points_df = pd.concat([dfs[df_dict[option]][lat], dfs[df_dict[option]][lon]], axis=1, keys=['lat','lon'])
@@ -61,8 +65,6 @@ if uploaded:
              ],
          ))
 
-    # Select Geoid Model
-
     geoid_dict = {'GEOID99': 1,
                   'G99SSS': 2,
                   'GEOID03': 3,
@@ -77,29 +79,25 @@ if uploaded:
                   'GEOID18': 14}
     units_dict ={'Meters': 1, 'US Feet': 2}
     
-    geoid_select = st.selectbox('Please Choose Desired Geoid', ('<select>',
-                                                                'GEOID99',
-                                                                'G99SSS',
-                                                                'GEOID03',
-                                                                'USGG2003',
-                                                                'GEOID06',
-                                                                'USGG2009',
-                                                                'GEOID09',
-                                                                'The latest experimental Geoid (XUSHG)',
-                                                                'USGG2012',
-                                                                'GEOID12A',
-                                                                'GEOID12B',
-                                                                'GEOID18'))
+    # Select Geoid Model
+    
+    geoid_options = list(geoid_dict.keys()).copy()
+    geoid_options.insert(0, '<select>')
+    geoid_select = st.selectbox('Please Choose Desired Geoid', geoid_options)
     
     if not geoid_select=='<select>':
         st.write('You selected:', geoid_select)
         geoid = geoid_dict[geoid_select]
+    
+    # Select Units for Conversion
     
     units_select = st.selectbox('Please Select Desired Units', ('<select>', 'Meters','US Feet'))
     
     if not units_select=='<select>':
         st.write('You selected:', units_select)
         units = units_dict[units_select]
+    
+    # Run Conversion
     
     if uploaded and not geoid_select=='<select>' and not units_select=='<select>':
         if st.button('CONVERT HEIGHTS'):
@@ -158,7 +156,7 @@ if uploaded:
             st.success('Height conversion finished. Click button below to download converted files.')
             
             
-            # Create the zip file and convert the dataframes to CSV
+            # Create the zip file, convert the dataframes to CSV, and save inside the zip
             
             with zipfile.ZipFile('Converted_CSV.zip', 'w') as csv_zip:
                 file_ctr = 0
@@ -166,7 +164,7 @@ if uploaded:
                     csv_zip.writestr(filenames[file_ctr].split('.')[0] + '_orthometric.csv', df.to_csv(index=False).encode('utf-8'))
                     file_ctr += 1   
             
-            # Download button for the zipped CSVs
+            # Download button for the zip file
             
             fp = open('Converted_CSV.zip', 'rb')
             st.download_button(
