@@ -6,7 +6,7 @@ import zipfile
 
 st.set_page_config(layout="wide")
 
-st.title('Ellipsoidal to Orthometric Heights')
+st.title('Ellipsoidal to Orthometric Heights (US)')
 
 st.sidebar.image('./logo.png', width = 260)
 st.sidebar.markdown('#')
