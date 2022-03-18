@@ -1,8 +1,9 @@
 import pandas as pd
-import pydeck as pdk
 import requests
 import streamlit as st
+import pydeck as pdk
 import zipfile
+
 
 st.title('Ellipsoidal to Orthometric Heights')
 st.caption('The application uses the NGS Geoid API to look up the geoid height at a particular location and uses this value to then compute the orthometric height based on the desired units of the user.')
@@ -20,6 +21,16 @@ for uploaded_csv in uploaded_csvs:
 
 # Checking if upload of all CSVs is successful
 
+expected_columns = ['# image name',
+                    'latitude [decimal degrees]',
+                    'longitude [decimal degrees]',
+                    'altitude [meter]',
+                    'omega [degrees]',
+                    'phi [degrees]',
+                    'kappa [degrees]',
+                    'accuracy horizontal [meter]',
+                    'accuracy vertical [meter]']
+
 if uploaded:
     dfs = []
     filenames = []
@@ -30,16 +41,42 @@ if uploaded:
         dfs.append(df)
         df_dict[uploaded_csv.name] = ctr
         filenames.append(uploaded_csv.name)
+        
+        lat = 'latitude [decimal degrees]'
+        lon = 'longitude [decimal degrees]'
+        height = 'altitude [meter]'
+        
         ctr += 1
-    st.success('All CSCvs uploaded successfully.')
+        
+        # Check if CSV is in the correct format
+        
+        format_check = True
+        for column in expected_columns:
+            if column not in list(df.columns):
+                st.text(column + ' is not in ' + uploaded_csv.name + '.')
+                format_check = False
+        
+        if not format_check:
+            msg = uploaded_csv.name + ' is not in the correct format. Delete or reupload to proceed.'
+            st.error(msg)
+            st.stop()
+        
+        # Check if locations are within the United States
+        
+        url = 'http://api.geonames.org/countryCode?lat='
+        geo_request = url + str(df[lat][0]) + '&lng=' + str(df[lon][0]) + '&type=json&username=irwinamago'
+        country = requests.get(geo_request).json()['countryName']
+        
+        if country != 'United States':
+            msg = 'Locations in ' + uploaded_csv.name + ' are outside the United States. Please remove to proceed.'
+            st.error(msg)
+            st.stop()
+    
+    st.success('All CSVs checked and uploaded successfully.')
     
     map_options = filenames.copy()
     map_options.insert(0, '<select>')
     option = st.selectbox('Select geotags CSV to visualize', map_options)
-    
-    lat = 'latitude [decimal degrees]'
-    lon = 'longitude [decimal degrees]'
-    height = 'altitude [meter]'
     
     # Option to visualize any of the CSVs
     
