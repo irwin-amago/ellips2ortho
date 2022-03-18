@@ -4,10 +4,15 @@ import streamlit as st
 import pydeck as pdk
 import zipfile
 
-
 st.title('Ellipsoidal to Orthometric Heights')
-st.caption('The application uses the United States NGS Geoid Height API to look up the geoid height at a particular location and uses this value to then compute the orthometric height based on the desired units of the user.')
-st.caption('To select the correct geoid model for your application, please visit: https://geodesy.noaa.gov/GEOID/.')
+
+
+st.sidebar.image('./logo.png', width = 250)
+st.sidebar.markdown('#')
+st.sidebar.write('The application uses the NGS Geoid API to look up the geoid height at a particular location and uses this value to then compute the orthometric height based on the desired units of the user.')
+st.sidebar.write('To select the correct geoid model for your application, please visit: https://geodesy.noaa.gov/GEOID/.')
+st.sidebar.markdown('#')
+st.sidebar.info('This is a prototype application. Wingtra AG does not guarantee correct functionality. Use with discretion.')
 
 # Upload button for CSVs
 
@@ -20,7 +25,7 @@ for uploaded_csv in uploaded_csvs:
     else:
         uplaoded = False
 
-# Checking if upload of all CSVs is successfulhttps://geodesy.noaa.gov/GEOID/.')
+# Checking if upload of all CSVs is successful
 
 expected_columns = ['# image name',
                     'latitude [decimal degrees]',
@@ -196,20 +201,32 @@ if uploaded:
             
             # Create the zip file, convert the dataframes to CSV, and save inside the zip
             
-            with zipfile.ZipFile('Converted_CSV.zip', 'w') as csv_zip:
-                file_ctr = 0
-                for df in dfs:
-                    csv_zip.writestr(filenames[file_ctr].split('.')[0] + '_orthometric.csv', df.to_csv(index=False).encode('utf-8'))
-                    file_ctr += 1   
-            
-            # Download button for the zip file
-            
-            fp = open('Converted_CSV.zip', 'rb')
-            st.download_button(
-                label="Download Converted Geotags CSV",
-                data=fp,
-                file_name='Converted_CSV.zip',
-                mime='application/zip',
+            if len(dfs)==1:
+                csv = dfs[0].to_csv(index=False).encode('utf-8')
+                filename = filenames[0].split('.')[0] + '_orthometric.csv'
+
+                st.download_button(
+                     label="Download Converted Geotags CSV",
+                     data=csv,
+                     file_name=filename,
+                     mime='text/csv',
+                 )
+                
+            else:                
+                with zipfile.ZipFile('Converted_CSV.zip', 'w') as csv_zip:
+                    file_ctr = 0
+                    for df in dfs:
+                        csv_zip.writestr(filenames[file_ctr].split('.')[0] + '_orthometric.csv', df.to_csv(index=False).encode('utf-8'))
+                        file_ctr += 1   
+                
+                # Download button for the zip file
+                
+                fp = open('Converted_CSV.zip', 'rb')
+                st.download_button(
+                    label="Download Converted Geotags CSV",
+                    data=fp,
+                    file_name='Converted_CSV.zip',
+                    mime='application/zip',
             )
     st.stop()
 else:
