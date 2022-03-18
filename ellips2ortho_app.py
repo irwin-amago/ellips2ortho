@@ -6,7 +6,7 @@ import zipfile
 
 
 st.title('Ellipsoidal to Orthometric Heights')
-st.caption('The application uses the NGS Geoid Height API to look up the geoid height at a particular location and uses this value to then compute the orthometric height based on the desired units of the user.')
+st.caption('The application uses the United States NGS Geoid Height API to look up the geoid height at a particular location and uses this value to then compute the orthometric height based on the desired units of the user.')
 st.caption('To select the correct geoid model for your application, please visit: https://geodesy.noaa.gov/GEOID/.')
 
 # Upload button for CSVs
