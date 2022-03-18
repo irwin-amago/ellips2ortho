@@ -48,6 +48,17 @@ if uploaded:
         
         ctr += 1
         
+        # Check if locations are within the United States
+        
+        url = 'http://api.geonames.org/countryCode?lat='
+        geo_request = url + str(df[lat][0]) + '&lng=' + str(df[lon][0]) + '&type=json&username=irwinamago'
+        country = requests.get(geo_request).json()['countryName']
+        
+        if country != 'United States':
+            msg = 'Locations in ' + uploaded_csv.name + ' are outside the United States. Please remove to proceed.'
+            st.error(msg)
+            st.stop()
+
         # Check if CSV is in the correct format
         
         format_check = True
@@ -58,17 +69,6 @@ if uploaded:
         
         if not format_check:
             msg = uploaded_csv.name + ' is not in the correct format. Delete or reupload to proceed.'
-            st.error(msg)
-            st.stop()
-        
-        # Check if locations are within the United States
-        
-        url = 'http://api.geonames.org/countryCode?lat='
-        geo_request = url + str(df[lat][0]) + '&lng=' + str(df[lon][0]) + '&type=json&username=irwinamago'
-        country = requests.get(geo_request).json()['countryName']
-        
-        if country != 'United States':
-            msg = 'Locations in ' + uploaded_csv.name + ' are outside the United States. Please remove to proceed.'
             st.error(msg)
             st.stop()
     
