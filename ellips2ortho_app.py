@@ -4,13 +4,15 @@ import streamlit as st
 import pydeck as pdk
 import zipfile
 
+st.set_page_config(layout="wide")
+
 st.title('Ellipsoidal to Orthometric Heights')
 
-
-st.sidebar.image('./logo.png', width = 250)
+st.sidebar.image('./logo.png', width = 260)
 st.sidebar.markdown('#')
 st.sidebar.write('The application uses the NGS Geoid API to look up the geoid height at a particular location and uses this value to then compute the orthometric height based on the desired units of the user.')
 st.sidebar.write('To select the correct geoid model for your application, please visit: https://geodesy.noaa.gov/GEOID/.')
+st.sidebar.write('If you have any questions regarding the application, please contact us at support@wingtra.com.')
 st.sidebar.markdown('#')
 st.sidebar.info('This is a prototype application. Wingtra AG does not guarantee correct functionality. Use with discretion.')
 
@@ -27,13 +29,10 @@ for uploaded_csv in uploaded_csvs:
 
 # Checking if upload of all CSVs is successful
 
-expected_columns = ['# image name',
+required_columns = ['# image name',
                     'latitude [decimal degrees]',
                     'longitude [decimal degrees]',
                     'altitude [meter]',
-                    'omega [degrees]',
-                    'phi [degrees]',
-                    'kappa [degrees]',
                     'accuracy horizontal [meter]',
                     'accuracy vertical [meter]']
 
