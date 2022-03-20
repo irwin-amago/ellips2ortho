@@ -119,7 +119,7 @@ if uploaded:
                   'GEOID12A': 12,
                   'GEOID12B': 13,
                   'GEOID18': 14}
-    units_dict ={'Meters': 1, 'US Feet': 2}
+    units_dict = {'Meters': 1, 'US Feet': 2}
     
     # Select Geoid Model
     
@@ -127,7 +127,7 @@ if uploaded:
     geoid_options.insert(0, '<select>')
     geoid_select = st.selectbox('Please Choose Desired Geoid', geoid_options)
     
-    if not geoid_select=='<select>':
+    if not geoid_select == '<select>':
         st.write('You selected:', geoid_select)
         geoid = geoid_dict[geoid_select]
     
@@ -135,13 +135,13 @@ if uploaded:
     
     units_select = st.selectbox('Please Select Desired Units', ('<select>', 'Meters','US Feet'))
     
-    if not units_select=='<select>':
+    if units_select != '<select>':
         st.write('You selected:', units_select)
         units = units_dict[units_select]
     
     # Run Conversion
     
-    if uploaded and not geoid_select=='<select>' and not units_select=='<select>':
+    if uploaded and geoid_select != '<select>' and units_select != '<select>':
         if st.button('CONVERT HEIGHTS'):
             file_ctr = 0
             for df in dfs:
@@ -179,14 +179,14 @@ if uploaded:
                     my_bar.progress((x+1)/len(df[lat]))     
                     ortho_height = ellip - responseGeoid.json()['geoidHeight']
                         
-                    if units==1:
+                    if units == 1:
                         ortho.append(ortho_height)
                     else:
                         ortho.append(ortho_height*3.2808399)
         
                 df[height] = ortho
                 file_ctr += 1
-                if units==1:
+                if units == 1:
                     df.rename(columns={height: 'orthometric height [meter]'}, inplace=True)
                 else:
                     df['accuracy horizontal [meter]'] = df['accuracy horizontal [meter]'].apply(lambda x: x*3.2808399)
@@ -200,7 +200,7 @@ if uploaded:
             
             # Create the zip file, convert the dataframes to CSV, and save inside the zip
             
-            if len(dfs)==1:
+            if len(dfs) == 1:
                 csv = dfs[0].to_csv(index=False).encode('utf-8')
                 filename = filenames[0].split('.')[0] + '_orthometric.csv'
 
