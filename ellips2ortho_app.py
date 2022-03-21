@@ -119,7 +119,7 @@ if uploaded:
                   'GEOID12A': 12,
                   'GEOID12B': 13,
                   'GEOID18': 14}
-    units_dict = {'Meters': 1, 'US Feet': 2}
+    units_dict ={'Meters': 1, 'US Feet': 2}
     
     # Select Geoid Model
     
@@ -127,7 +127,7 @@ if uploaded:
     geoid_options.insert(0, '<select>')
     geoid_select = st.selectbox('Please Choose Desired Geoid', geoid_options)
     
-    if not geoid_select == '<select>':
+    if not geoid_select=='<select>':
         st.write('You selected:', geoid_select)
         geoid = geoid_dict[geoid_select]
     
@@ -135,29 +135,55 @@ if uploaded:
     
     units_select = st.selectbox('Please Select Desired Units', ('<select>', 'Meters','US Feet'))
     
-    if units_select != '<select>':
+    if not units_select=='<select>':
         st.write('You selected:', units_select)
         units = units_dict[units_select]
     
     # Run Conversion
     
-    if uploaded and geoid_select != '<select>' and units_select != '<select>':
+    if uploaded and not geoid_select=='<select>' and not units_select=='<select>':
         if st.button('CONVERT HEIGHTS'):
             file_ctr = 0
             for df in dfs:
                 st.text('Processing ' + filenames[file_ctr] + '.')
-                my_bar = st.progress(0)
-                cmd = 'https://geodesy.noaa.gov/api/geoid/ght?'
+                my_bar = st.progress(0)               
+                cmd_h = 'https://geodesy.noaa.gov/api/ncat/llh?'
+                cmd_v = 'https://geodesy.noaa.gov/api/geoid/ght?'
                 
                 ortho = []
                 for x in range(len(df[lat])):
-                    lat_req = str(df[lat][x])
-                    lon_req = str(df[lon][x])
+                    lat_wgs84 = str(df[lat][x])
+                    lon_wgs84 = str(df[lon][x])
                     ellip = df[height][x]
-                    req = cmd + 'lat=' + lat_req + '&lon=' + lon_req + '&model=' + str(geoid)
+                    
+                    req_h = cmd_h + 'lat=' + lat_wgs84 + '&lon=' + lon_wgs84 + '&inDatum=nad83(1986)&outDatum=nad83(2011)'
+                    
+                    try:
+                        responseNad =  requests.get(req_h)
+                        responseNad.raise_for_status()
+                    except requests.HTTPError  as errh:
+                        msg = "Error Connecting: " + str(errh)
+                        st.error(msg)
+                        st.stop()
+                    except requests.ConnectionError as errc:
+                        msg = "Error Connecting: " + str(errc)
+                        st.error(msg)
+                        st.stop()
+                    except requests.Timeout as errt:
+                        msg = "Error Connecting: " + str(errt)
+                        st.error(msg)
+                        st.stop()
+                    except requests.RequestException as err:
+                        msg = "Error Connecting: " + str(err)
+                        st.error(msg)
+                        st.stop()
+                    
+                    lat_nad = responseNad.json()['destLat']
+                    lon_nad = responseNad.json()['destLon']
+                    req_v = cmd_v + 'lat=' + lat_nad + '&lon=' + lon_nad + '&model=' + str(geoid)
                         
                     try:
-                        responseGeoid = requests.get(req)
+                        responseGeoid = requests.get(req_v)
                         responseGeoid.raise_for_status()
                     except requests.HTTPError  as errh:
                         msg = "Error Connecting: " + str(errh)
@@ -175,18 +201,18 @@ if uploaded:
                         msg = "Error Connecting: " + str(err)
                         st.error(msg)
                         st.stop()
-                
+                        
                     my_bar.progress((x+1)/len(df[lat]))     
                     ortho_height = ellip - responseGeoid.json()['geoidHeight']
                         
-                    if units == 1:
+                    if units==1:
                         ortho.append(ortho_height)
                     else:
                         ortho.append(ortho_height*3.2808399)
         
                 df[height] = ortho
                 file_ctr += 1
-                if units == 1:
+                if units==1:
                     df.rename(columns={height: 'orthometric height [meter]'}, inplace=True)
                 else:
                     df['accuracy horizontal [meter]'] = df['accuracy horizontal [meter]'].apply(lambda x: x*3.2808399)
@@ -200,7 +226,7 @@ if uploaded:
             
             # Create the zip file, convert the dataframes to CSV, and save inside the zip
             
-            if len(dfs) == 1:
+            if len(dfs)==1:
                 csv = dfs[0].to_csv(index=False).encode('utf-8')
                 filename = filenames[0].split('.')[0] + '_orthometric.csv'
 
@@ -219,7 +245,6 @@ if uploaded:
                         file_ctr += 1   
                 
                 # Download button for the zip file
-                
                 fp = open('Converted_CSV.zip', 'rb')
                 st.download_button(
                     label="Download Converted Geotags CSV",
